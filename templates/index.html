@@ -1,0 +1,848 @@
+<!-- templates/index.html - Light theme with no strikethrough -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL & Text Classifier - AI Security System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        /* Input Section */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', monospace;
+            color: #333;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        textarea::placeholder {
+            color: #999;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        /* Result Section */
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .result-status {
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-safe {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            word-break: break-all;
+        }
+
+        /* Batch Results */
+        .batch-results {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .batch-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: transform 0.3s;
+        }
+
+        .batch-item:hover {
+            transform: translateX(5px);
+            background: #f0f0f0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            animation: slideInRight 0.3s ease;
+            z-index: 2000;
+            color: #333;
+            border-left: 4px solid;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        /* Feature Badges */
+        .feature-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i> Platform Analyzes URL and Text
+            </div>
+            <div class="nav-links">
+                <a class="nav-link active" onclick="showTab('single')">Single Scan</a>
+                <a class="nav-link" onclick="showTab('batch')">Batch Scan</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> Platform Analyzes URL and Text</h1>
+            <p>Detect malicious URLs and spam messages with advanced machine learning</p>
+            <div class="feature-badges">
+                <span class="badge"><i class="fas fa-chart-line"></i> 95%+ Accuracy</span>
+                <span class="badge"><i class="fas fa-bolt"></i> Real-time Detection</span>
+                <span class="badge"><i class="fas fa-shield-virus"></i> Zero-day Protection</span>
+            </div>
+        </div>
+
+        <!-- Single Scan Tab -->
+        <div id="singleTab" class="tab-content">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-search"></i>
+                    Single Input Analysis
+                </div>
+                <div class="input-group">
+                    <textarea id="singleInput" rows="4" placeholder="Enter a URL or text message to analyze...&#10;&#10;Examples:&#10;• https://example.com&#10;• Congratulations! You've won a free iPhone! Click here to claim now!&#10;• www.suspicious-site.com/login"></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="classifySingle()">
+                        <i class="fas fa-microchip"></i> Analyze Now
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearSingle()">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div id="singleResult" style="display: none;"></div>
+        </div>
+
+        <!-- Batch Scan Tab -->
+        <div id="batchTab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-layer-group"></i>
+                    Batch Analysis
+                </div>
+                <div class="input-group">
+                    <textarea id="batchInput" rows="6" placeholder="Enter multiple URLs or text messages (one per line)&#10;&#10;Example:&#10;https://example.com&#10;Win a free prize now!&#10;www.phishing-site.com&#10;Your account has been compromised"></textarea>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="classifyBatch()">
+                        <i class="fas fa-chart-line"></i> Analyze All
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearBatch()">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div id="batchResult" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentTab = 'single';
+
+        function showTab(tab) {
+            currentTab = tab;
+            document.getElementById('singleTab').style.display = tab === 'single' ? 'block' : 'none';
+            document.getElementById('batchTab').style.display = tab === 'batch' ? 'block' : 'none';
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function clearSingle() {
+            document.getElementById('singleInput').value = '';
+            document.getElementById('singleResult').style.display = 'none';
+            document.getElementById('singleResult').innerHTML = '';
+        }
+
+        function clearBatch() {
+            document.getElementById('batchInput').value = '';
+            document.getElementById('batchResult').style.display = 'none';
+            document.getElementById('batchResult').innerHTML = '';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatResult(result, isBatch = false) {
+            const isSafe = result.label === 'benign' || result.label === 'ham';
+            const statusClass = isSafe ? 'status-safe' : 'status-danger';
+            const statusIcon = isSafe ? 'fa-check-circle' : 'fa-exclamation-triangle';
+            const statusText = isSafe ? (result.label === 'benign' ? 'BENIGN / SAFE' : 'HAM / SAFE') : (result.label === 'malicious' ? 'MALICIOUS' : 'SPAM');
+            
+            let html = `
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-status ${statusClass}">
+                            <i class="fas ${statusIcon}"></i>
+                            ${statusText}
+                        </div>
+                        <small><i class="fas fa-clock"></i> ${result.timestamp || new Date().toLocaleString()}</small>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${(result.confidence * 100).toFixed(1)}%">
+                            ${(result.confidence * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-tag"></i> Input Type</div>
+                            <div class="info-value">${result.input_type.toUpperCase()}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-chart-line"></i> Confidence Score</div>
+                            <div class="info-value">${(result.confidence * 100).toFixed(2)}%</div>
+                        </div>
+            `;
+            
+            if (result.input_type === 'url') {
+                html += `
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-link"></i> URL</div>
+                            <div class="info-value">${escapeHtml(result.url)}</div>
+                        </div>
+                `;
+            } else {
+                html += `
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-envelope"></i> Message Preview</div>
+                            <div class="info-value">${escapeHtml(result.original_text.substring(0, 100))}${result.original_text.length > 100 ? '...' : ''}</div>
+                        </div>
+                `;
+            }
+            
+            html += `</div></div>`;
+            return html;
+        }
+
+        function formatBatchItem(result, index) {
+            const isSafe = result.label === 'benign' || result.label === 'ham';
+            const borderColor = isSafe ? '#28a745' : '#dc3545';
+            const statusIcon = isSafe ? '' : '';
+            
+            return `
+                <div class="batch-item" style="border-left-color: ${borderColor}">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                        <strong style="color: ${borderColor}">#${index + 1} - ${result.input_type.toUpperCase()}</strong>
+                        <span>${statusIcon} ${result.label.toUpperCase()}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">
+                        ${escapeHtml(result.input_type === 'url' ? result.url : result.original_text.substring(0, 150))}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #999;">
+                        <span>Confidence: ${(result.confidence * 100).toFixed(1)}%</span>
+                        <span>${result.timestamp || new Date().toLocaleTimeString()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function classifySingle() {
+            const input = document.getElementById('singleInput').value.trim();
+            if (!input) {
+                showToast('Please enter a URL or text message to analyze', 'error');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('singleResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading" style="display: block;"><div class="spinner"></div><p style="margin-top: 1rem;">Analyzing...</p></div>';
+            
+            try {
+                const response = await fetch('/classify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: input })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = formatResult(data);
+                    showToast('Analysis completed successfully!', 'success');
+                } else {
+                    resultDiv.innerHTML = `<div class="result-card" style="background: #f8d7da; color: #721c24;">
+                        <i class="fas fa-exclamation-circle"></i> Error: ${data.error}
+                    </div>`;
+                    showToast(data.error, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result-card" style="background: #f8d7da; color: #721c24;">
+                    <i class="fas fa-exclamation-circle"></i> Error: ${error.message}
+                </div>`;
+                showToast('Network error occurred', 'error');
+            }
+        }
+        
+        async function classifyBatch() {
+            const input = document.getElementById('batchInput').value.trim();
+            if (!input) {
+                showToast('Please enter URLs or text messages to analyze', 'error');
+                return;
+            }
+            
+            const texts = input.split('\n').filter(t => t.trim());
+            if (texts.length === 0) {
+                showToast('No valid input found', 'error');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('batchResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<div class="loading" style="display: block;"><div class="spinner"></div><p style="margin-top: 1rem;">Analyzing ${texts.length} items...</p></div>`;
+            
+            try {
+                const response = await fetch('/batch_classify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ texts: texts })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let html = `
+                        <div class="card">
+                            <div class="card-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Batch Analysis Results
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number">${data.statistics.total}</div>
+                                    <div class="stat-label">Total Analyzed</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${data.statistics.malicious_spam}</div>
+                                    <div class="stat-label">Threats Detected</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${data.statistics.benign_ham}</div>
+                                    <div class="stat-label">Safe Items</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${data.statistics.urls}</div>
+                                    <div class="stat-label">🔗 URLs</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number">${data.statistics.texts}</div>
+                                    <div class="stat-label">💬 Text Messages</div>
+                                </div>
+                            </div>
+                            <div class="batch-results">
+                    `;
+                    
+                    data.results.forEach((result, index) => {
+                        html += formatBatchItem(result, index);
+                    });
+                    
+                    html += `</div></div>`;
+                    resultDiv.innerHTML = html;
+                    showToast(`Analyzed ${data.statistics.total} items. Found ${data.statistics.malicious_spam} threats!`, 'success');
+                } else {
+                    resultDiv.innerHTML = `<div class="result-card" style="background: #f8d7da; color: #721c24;">
+                        <i class="fas fa-exclamation-circle"></i> Error: ${data.error}
+                    </div>`;
+                    showToast(data.error, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result-card" style="background: #f8d7da; color: #721c24;">
+                    <i class="fas fa-exclamation-circle"></i> Error: ${error.message}
+                </div>`;
+                showToast('Network error occurred', 'error');
+            }
+        }
+
+        // Add keyboard shortcut (Ctrl+Enter to analyze)
+        document.getElementById('singleInput').addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                classifySingle();
+            }
+        });
+
+        document.getElementById('batchInput').addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                classifyBatch();
+            }
+        });
+
+        // Check model status on load
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+                if (!data.models_ready) {
+                    showToast('Models are loading, please wait...', 'error');
+                }
+            } catch (error) {
+                console.error('Error checking model status:', error);
+            }
+        }
+
+        checkModelStatus();
+    </script>
+</body>
+</html>

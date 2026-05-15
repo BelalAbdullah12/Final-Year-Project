@@ -1,0 +1,824 @@
+<!-- templates/admin.html - Updated with working training -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CyberGuard AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .stat-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-not-ready {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #333;
+        }
+
+        .card-title i {
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .metric-label {
+            color: #666;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logs-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .log-entry {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i> Platform Analyzes URL and Text
+            </div>
+            <div class="nav-links">
+                <a class="nav-link" onclick="showSection('dashboard')">Dashboard</a>
+                <a class="nav-link" onclick="showSection('training')">Training</a>
+                <a class="nav-link" onclick="showSection('performance')">Performance</a>
+                <a class="nav-link" onclick="showSection('logs')">Logs</a>
+                <a href="/admin/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cog"></i> Admin Control Panel</h1>
+            <p>Manage and monitor your security models</p>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="stat-value">Loading...</div>
+                    <div class="stat-label">System Status</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    System Information
+                </div>
+                <div id="systemInfo">
+                    <p>Loading system information...</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-database"></i>
+                    Quick Actions
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="retrainModels()">
+                        <i class="fas fa-sync-alt"></i> Retrain All Models
+                    </button>
+                    <button class="btn btn-success" onclick="refreshStatus()">
+                        <i class="fas fa-refresh"></i> Refresh Status
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Section -->
+        <div id="trainingSection" class="section" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-link"></i>
+                    Train URL Classification Model
+                </div>
+                <div class="form-group">
+                    <label>Dataset Path</label>
+                    <input type="text" id="urlDatasetPath" value="datasets/project_dataset.csv">
+                </div>
+                <button class="btn btn-primary" onclick="trainURLModel()" id="trainURLBtn">
+                    <i class="fas fa-chart-line"></i> Train URL Model
+                </button>
+                <div id="urlTrainingResult" style="margin-top: 1rem;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-envelope"></i>
+                    Train Text Classification Model
+                </div>
+                <div class="form-group">
+                    <label>Dataset Path</label>
+                    <input type="text" id="textDatasetPath" value="datasets/spam.csv">
+                </div>
+                <button class="btn btn-primary" onclick="trainTextModel()" id="trainTextBtn">
+                    <i class="fas fa-chart-line"></i> Train Text Model
+                </button>
+                <div id="textTrainingResult" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- Performance Section -->
+        <div id="performanceSection" class="section" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    URL Model Performance
+                </div>
+                <div id="urlPerformance"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Text Model Performance
+                </div>
+                <div id="textPerformance"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Refresh Performance Data
+                </div>
+                <button class="btn btn-primary" onclick="loadPerformance()">
+                    <i class="fas fa-refresh"></i> Refresh Metrics
+                </button>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div id="logsSection" class="section" style="display: none;">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-history"></i>
+                    Training Logs
+                </div>
+                <div id="logsContainer" class="logs-container">
+                    <div class="loading"><div class="spinner"></div><p>Loading logs...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show selected section
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(`${section}Section`).style.display = 'block';
+            
+            if (section === 'dashboard') {
+                loadDashboard();
+            } else if (section === 'performance') {
+                loadPerformance();
+            } else if (section === 'logs') {
+                loadLogs();
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            await loadSystemStatus();
+        }
+
+        // Load system status
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/admin/status');
+                const data = await response.json();
+                
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-link"></i></div>
+                        <div class="stat-value">${data.url_model ? '✓' : '✗'}</div>
+                        <div class="stat-label">URL Model</div>
+                        <div class="stat-status ${data.url_model ? 'status-ready' : 'status-not-ready'}">
+                            ${data.url_model ? 'Ready' : 'Not Ready'}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="stat-value">${data.text_model ? '✓' : '✗'}</div>
+                        <div class="stat-label">Text Model</div>
+                        <div class="stat-status ${data.text_model ? 'status-ready' : 'status-not-ready'}">
+                            ${data.text_model ? 'Ready' : 'Not Ready'}
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-value">${data.models_ready ? 'Ready' : 'Pending'}</div>
+                        <div class="stat-label">System Status</div>
+                        <div class="stat-status ${data.models_ready ? 'status-ready' : 'status-not-ready'}">
+                            ${data.models_ready ? 'Operational' : 'Needs Training'}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('systemInfo').innerHTML = `
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value">URL + Text</div>
+                            <div class="metric-label">Model Types</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">Real-time</div>
+                            <div class="metric-label">Inference Speed</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">Auto-detect</div>
+                            <div class="metric-label">Input Type</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value">ML Models</div>
+                            <div class="metric-label">Logistic Regression + Naive Bayes</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading status:', error);
+                document.getElementById('statsGrid').innerHTML = '<div class="alert alert-error">Error loading status</div>';
+            }
+        }
+
+        // Train URL model
+        async function trainURLModel() {
+            const datasetPath = document.getElementById('urlDatasetPath').value;
+            const resultDiv = document.getElementById('urlTrainingResult');
+            const trainBtn = document.getElementById('trainURLBtn');
+            
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Training URL model... This may take a moment.</p></div>';
+            trainBtn.disabled = true;
+            trainBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Training...';
+            
+            try {
+                const response = await fetch('/admin/train/url', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({dataset_path: datasetPath})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> ${data.message}
+                        </div>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.accuracy * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.precision * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Precision</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.recall * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Recall</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.f1_score * 100).toFixed(2)}%</div>
+                                <div class="metric-label">F1 Score</div>
+                            </div>
+                        </div>
+                    `;
+                    showToast('URL model trained successfully!', 'success');
+                    await loadSystemStatus();
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-error">Error: ${data.error}</div>`;
+                    showToast('Training failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+                showToast('Training failed: ' + error.message, 'error');
+            } finally {
+                trainBtn.disabled = false;
+                trainBtn.innerHTML = '<i class="fas fa-chart-line"></i> Train URL Model';
+            }
+        }
+
+        // Train text model
+        async function trainTextModel() {
+            const datasetPath = document.getElementById('textDatasetPath').value;
+            const resultDiv = document.getElementById('textTrainingResult');
+            const trainBtn = document.getElementById('trainTextBtn');
+            
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Training text model... This may take a moment.</p></div>';
+            trainBtn.disabled = true;
+            trainBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Training...';
+            
+            try {
+                const response = await fetch('/admin/train/text', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({dataset_path: datasetPath})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> ${data.message}
+                        </div>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.accuracy * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.precision * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Precision</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.recall * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Recall</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.metrics.f1_score * 100).toFixed(2)}%</div>
+                                <div class="metric-label">F1 Score</div>
+                            </div>
+                        </div>
+                    `;
+                    showToast('Text model trained successfully!', 'success');
+                    await loadSystemStatus();
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-error">Error: ${data.error}</div>`;
+                    showToast('Training failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+                showToast('Training failed: ' + error.message, 'error');
+            } finally {
+                trainBtn.disabled = false;
+                trainBtn.innerHTML = '<i class="fas fa-chart-line"></i> Train Text Model';
+            }
+        }
+
+        // Load performance metrics
+        async function loadPerformance() {
+            const urlPerfDiv = document.getElementById('urlPerformance');
+            const textPerfDiv = document.getElementById('textPerformance');
+            
+            urlPerfDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading URL model performance...</p></div>';
+            textPerfDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading text model performance...</p></div>';
+            
+            try {
+                const response = await fetch('/admin/performance');
+                const data = await response.json();
+                
+                if (data.url_model && !data.url_model.error) {
+                    urlPerfDiv.innerHTML = `
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.url_model.accuracy * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.url_model.precision * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Precision</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.url_model.recall * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Recall</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.url_model.f1_score * 100).toFixed(2)}%</div>
+                                <div class="metric-label">F1 Score</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    urlPerfDiv.innerHTML = '<div class="alert alert-info">URL model not trained yet. Go to Training section to train.</div>';
+                }
+                
+                if (data.text_model && !data.text_model.error) {
+                    textPerfDiv.innerHTML = `
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.text_model.accuracy * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Accuracy</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.text_model.precision * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Precision</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.text_model.recall * 100).toFixed(2)}%</div>
+                                <div class="metric-label">Recall</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">${(data.text_model.f1_score * 100).toFixed(2)}%</div>
+                                <div class="metric-label">F1 Score</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    textPerfDiv.innerHTML = '<div class="alert alert-info">Text model not trained yet. Go to Training section to train.</div>';
+                }
+            } catch (error) {
+                urlPerfDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+                textPerfDiv.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load logs
+        async function loadLogs() {
+            const logsContainer = document.getElementById('logsContainer');
+            logsContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading logs...</p></div>';
+            
+            try {
+                const response = await fetch('/admin/logs');
+                const data = await response.json();
+                
+                if (data.logs && data.logs.length > 0) {
+                    logsContainer.innerHTML = data.logs.map(log => `
+                        <div class="log-entry">
+                            <strong>${new Date(log.timestamp).toLocaleString()}</strong> - ${log.action}
+                            ${log.metrics ? `<br>Accuracy: ${(log.metrics.accuracy * 100).toFixed(2)}%` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    logsContainer.innerHTML = '<div class="alert alert-info">No training logs found. Train some models to see logs.</div>';
+                }
+            } catch (error) {
+                logsContainer.innerHTML = `<div class="alert alert-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Retrain models
+        async function retrainModels() {
+            if (!confirm('This will retrain both models. This may take a few minutes. Continue?')) return;
+            
+            showToast('Retraining models. This may take a moment...', 'info');
+            
+            try {
+                const response = await fetch('/admin/retrain', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Models retrained successfully!', 'success');
+                    await loadSystemStatus();
+                    await loadPerformance();
+                } else {
+                    showToast(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Refresh status
+        async function refreshStatus() {
+            await loadDashboard();
+            showToast('Status refreshed!', 'success');
+        }
+
+        // Toast notification
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'error' ? 'error' : 'success'}`;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.maxWidth = '300px';
+            toast.style.animation = 'slideIn 0.3s ease';
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Load initial dashboard
+        loadDashboard();
+    </script>
+</body>
+</html>
