@@ -26,7 +26,6 @@ except LookupError:
         nltk.download('punkt_tab', quiet=True)
     except Exception as e:
         print(f"Warning: Could not download NLTK data: {e}")
-        print("Please manually download using: python -c 'import nltk; nltk.download(\"punkt\"); nltk.download(\"stopwords\")'")
 
 # Feature extraction patterns
 ipv4_simple = r"\b\d{1,3}(?:\.\d{1,3}){3}\b"
@@ -64,7 +63,8 @@ class URLTextClassifier:
     
     def __init__(self, url_model_path='models/url_model.pkl', 
                  text_model_path='models/text_model.pkl', 
-                 auto_train=True, url_dataset_path='datasets/project_dataset.csv'):
+                 auto_train=True, url_dataset_path='datasets/project_dataset.csv',
+                 force_retrain=False):  # Added force_retrain parameter
         
         self.url_model_loaded = False
         self.text_model_loaded = False
@@ -76,51 +76,61 @@ class URLTextClassifier:
         os.makedirs('models', exist_ok=True)
         
         # Try to load URL model
-        try:
-            if os.path.exists(url_model_path):
-                # Use a custom unpickler that can find the function
-                from joblib import load
-                self.url_pipeline = load(url_model_path)
-                self.url_model_loaded = True
-                print(f"✅ URL model loaded from {url_model_path}")
-            else:
-                print(f"⚠️ URL model not found at {url_model_path}")
+        if not force_retrain:  # Only try to load if not forcing retrain
+            try:
+                if os.path.exists(url_model_path):
+                    # Use a custom unpickler that can find the function
+                    from joblib import load
+                    self.url_pipeline = load(url_model_path)
+                    self.url_model_loaded = True
+                    print(f"✅ URL model loaded from {url_model_path}")
+                else:
+                    print(f"⚠️ URL model not found at {url_model_path}")
+                    if auto_train:
+                        self._train_url_model(url_dataset_path, url_model_path)
+                        self.url_model_loaded = True
+            except Exception as e:
+                print(f"⚠️ Error loading URL model: {e}")
                 if auto_train:
-                    self._train_url_model(url_dataset_path, url_model_path)
-                    self.url_model_loaded = True
-        except Exception as e:
-            print(f"⚠️ Error loading URL model: {e}")
-            if auto_train:
-                try:
-                    self._train_url_model(url_dataset_path, url_model_path)
-                    self.url_model_loaded = True
-                except Exception as e2:
-                    print(f"❌ Failed to train URL model: {e2}")
+                    try:
+                        self._train_url_model(url_dataset_path, url_model_path)
+                        self.url_model_loaded = True
+                    except Exception as e2:
+                        print(f"❌ Failed to train URL model: {e2}")
+        else:
+            print("🔄 Force retraining URL model...")
+            self._train_url_model(url_dataset_path, url_model_path)
+            self.url_model_loaded = True
         
         # Try to load text model
-        try:
-            if os.path.exists(text_model_path):
-                model_data = joblib.load(text_model_path)
-                self.text_model = model_data['classifier']
-                self.tfidf_vectorizer = model_data['vectorizer']
-                self.text_model_loaded = True
-                print(f"✅ Text model loaded from {text_model_path}")
-            else:
-                print(f"⚠️ Text model not found at {text_model_path}")
+        if not force_retrain:  # Only try to load if not forcing retrain
+            try:
+                if os.path.exists(text_model_path):
+                    model_data = joblib.load(text_model_path)
+                    self.text_model = model_data['classifier']
+                    self.tfidf_vectorizer = model_data['vectorizer']
+                    self.text_model_loaded = True
+                    print(f"✅ Text model loaded from {text_model_path}")
+                else:
+                    print(f"⚠️ Text model not found at {text_model_path}")
+                    if auto_train:
+                        self._train_text_model(save_path=text_model_path)
+                        self.text_model_loaded = True
+            except Exception as e:
+                print(f"⚠️ Error loading text model: {e}")
                 if auto_train:
-                    self._train_text_model(save_path=text_model_path)
-                    self.text_model_loaded = True
-        except Exception as e:
-            print(f"⚠️ Error loading text model: {e}")
-            if auto_train:
-                try:
-                    self._train_text_model(save_path=text_model_path)
-                    self.text_model_loaded = True
-                except Exception as e2:
-                    print(f"❌ Failed to train text model: {e2}")
+                    try:
+                        self._train_text_model(save_path=text_model_path)
+                        self.text_model_loaded = True
+                    except Exception as e2:
+                        print(f"❌ Failed to train text model: {e2}")
+        else:
+            print("🔄 Force retraining text model...")
+            self._train_text_model(save_path=text_model_path)
+            self.text_model_loaded = True
     
     def _train_url_model(self, dataset_path, model_path):
-        """Train URL model"""
+        """Train URL model and save it"""
         print("🔄 Training URL model...")
         
         # Check if dataset exists
@@ -129,6 +139,7 @@ class URLTextClassifier:
             print("Creating a sample dataset for demonstration...")
             self._create_sample_url_dataset(dataset_path)
         
+        # Load and train
         df = pd.read_csv(dataset_path)
         X = df[["url"]]
         y = df["result"]
@@ -154,11 +165,20 @@ class URLTextClassifier:
             ("clf", LogisticRegression(max_iter=2000, random_state=42))
         ])
         
+        # Train the model
         pipeline.fit(X, y)
+        
+        # Save the model
         joblib.dump(pipeline, model_path)
         print(f"✅ URL model trained and saved to {model_path}")
-        self.url_pipeline = pipeline
         
+        # Verify the model was saved
+        if os.path.exists(model_path):
+            print(f"✅ Verification: Model file exists at {model_path} (Size: {os.path.getsize(model_path)} bytes)")
+        else:
+            print(f"❌ ERROR: Model file was not saved properly!")
+        
+        self.url_pipeline = pipeline
         return pipeline
     
     def _create_sample_url_dataset(self, dataset_path):
@@ -188,7 +208,7 @@ class URLTextClassifier:
         print(f"✅ Sample URL dataset created at {dataset_path}")
     
     def _train_text_model(self, save_path):
-        """Train text model"""
+        """Train text model and save it"""
         print("🔄 Training text model...")
         
         dataset_path = 'datasets/spam.csv'
@@ -243,12 +263,19 @@ class URLTextClassifier:
         text_model = MultinomialNB()
         text_model.fit(X, y)
         
+        # Save the model with vectorizer
         model_data = {
             'classifier': text_model,
             'vectorizer': tfidf_vectorizer
         }
         joblib.dump(model_data, save_path)
         print(f"✅ Text model trained and saved to {save_path}")
+        
+        # Verify the model was saved
+        if os.path.exists(save_path):
+            print(f"✅ Verification: Model file exists at {save_path} (Size: {os.path.getsize(save_path)} bytes)")
+        else:
+            print(f"❌ ERROR: Model file was not saved properly!")
         
         self.text_model = text_model
         self.tfidf_vectorizer = tfidf_vectorizer
@@ -365,3 +392,35 @@ class URLTextClassifier:
     def classify_batch(self, inputs):
         """Classify multiple inputs"""
         return [self.classify(user_input) for user_input in inputs]
+    
+    def retrain_all_models(self):
+        """Force retrain and save both models"""
+        print("🔄 Retraining all models from scratch...")
+        self._train_url_model('datasets/project_dataset.csv', 'models/url_model.pkl')
+        self._train_text_model('models/text_model.pkl')
+        print("✅ All models retrained and saved successfully!")
+
+
+# Example usage to test saving
+if __name__ == "__main__":
+    # Test the classifier
+    print("=" * 50)
+    print("Testing classifier with model saving...")
+    print("=" * 50)
+    
+    # Force retrain to ensure models are saved
+    classifier = URLTextClassifier(auto_train=True, force_retrain=True)
+    
+    # Test classification
+    test_inputs = [
+        "https://www.google.com",
+        "Congratulations! You won a prize!",
+        "Hello, how are you?"
+    ]
+    
+    for input_text in test_inputs:
+        result = classifier.classify(input_text)
+        print(f"\nInput: {input_text}")
+        print(f"Type: {result['input_type']}")
+        print(f"Prediction: {result['label']}")
+        print(f"Confidence: {result['confidence']:.2f}")
